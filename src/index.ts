@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
 config();
 
+import './api';
+
 import { GuildConfiguration, initialize as initializeDatabase, Post, Postgres, UserVote } from './database';
 import { loadContextMenus, loadMessageCommands, loadSlashCommands, synchronizeSlashCommands } from './handlers/commands';
 
@@ -120,7 +122,9 @@ client.on('interactionCreate', async (interaction) => {
 
         const userVote = await Postgres.getRepository(UserVote).findOne({
             where: {
-                postId,
+                post: {
+                    id: postId
+                },
                 userId: interaction.user.id
             }
         });
@@ -135,7 +139,7 @@ client.on('interactionCreate', async (interaction) => {
                 });
             } else {
                 await Postgres.getRepository(UserVote).insert({
-                    postId,
+                    post,
                     userId: interaction.user.id,
                     voteValue: 1
                 });
@@ -154,7 +158,7 @@ client.on('interactionCreate', async (interaction) => {
                 });
             } else {
                 await Postgres.getRepository(UserVote).insert({
-                    postId,
+                    post,
                     userId: interaction.user.id,
                     voteValue: -1
                 });

@@ -1,4 +1,4 @@
-import { Entity, Column, DataSource, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn } from "typeorm";
+import { Entity, Column, DataSource, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import express from 'express';
 import { Database, Resource } from '@adminjs/typeorm';
 import { validate } from 'class-validator';
@@ -61,6 +61,9 @@ export class Post extends BaseEntity {
     @Column()
     projectImageUrl!: string;
 
+    @OneToMany(() => UserVote, vote => vote.post)
+    votes!: UserVote[];
+
     @CreateDateColumn()
     createdAt!: Date;
 
@@ -76,8 +79,8 @@ export class UserVote extends BaseEntity {
     })
     userId!: string;
 
-    @Column()
-    postId!: number;
+    @ManyToOne(() => Post, post => post.votes)
+    post!: Post;
 
     @Column()
     voteValue!: number;
