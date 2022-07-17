@@ -82,15 +82,17 @@ client.on('interactionCreate', async (interaction) => {
                     const row = new ActionRowBuilder()
                         .setComponents([
                             new ButtonBuilder()
-                                .setLabel('Upvote')
-                                .setCustomId(`upvote_${postId}`)
-                                //.setEmoji('⬆️')
-                                .setStyle(ButtonStyle.Success),
+                                .setLabel('⬆️')
+                                .setCustomId(`upvote_1_${postId}`)
+                                .setStyle(ButtonStyle.Primary),
                             new ButtonBuilder()
-                                .setLabel('Downvote')
-                                .setCustomId(`downvote_${postId}`)
-                                //.setEmoji('⬇️')
-                                .setStyle(ButtonStyle.Danger)
+                                .setLabel('⬆️⬆️')
+                                .setCustomId(`upvote_2_${postId}`)
+                                .setStyle(ButtonStyle.Primary),
+                            new ButtonBuilder()
+                                .setLabel('⬆️⬆️⬆️')
+                                .setCustomId(`upvote_3_${postId}`)
+                                .setStyle(ButtonStyle.Primary)
                         ]) as ActionRowBuilder<ButtonBuilder>;
                     channel.send({
                         content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
@@ -107,7 +109,10 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isButton()) {
 
         const customId = interaction.customId;
-        const postId = parseInt(customId.split('_')[1]);
+        if (!customId.startsWith('upvote')) return;
+        const [,_points,_postId] = customId.split('_');
+        const points = parseInt(_points);
+        const postId = parseInt(_postId);
         const post = await Postgres.getRepository(Post).findOne({
             where: {
                 id: postId
@@ -125,53 +130,30 @@ client.on('interactionCreate', async (interaction) => {
                 post: {
                     id: postId
                 },
-                userId: interaction.user.id
+                userId: interaction.user.id,
+                guildId: interaction.guildId!
             }
         });
 
-        if (customId.startsWith('upvote')) {
-            if (userVote) {
-                userVote.voteValue = 1;
-                await Postgres.getRepository(UserVote).save(userVote);
-                return void interaction.reply({
-                    ephemeral: true,
-                    content: `You already voted for this project. Your vote has successfully been updated.`
-                });
-            } else {
-                await Postgres.getRepository(UserVote).insert({
-                    post,
-                    userId: interaction.user.id,
-                    voteValue: 1
-                });
-                return void interaction.reply({
-                    ephemeral: true,
-                    content: `You have successfully voted for this project.`
-                });
-            }
-        } else if (customId.startsWith('downvote')) {
-            if (userVote) {
-                userVote.voteValue = -1;
-                await Postgres.getRepository(UserVote).save(userVote);
-                return void interaction.reply({
-                    ephemeral: true,
-                    content: `You already voted for this project. Your vote has successfully been updated.`
-                });
-            } else {
-                await Postgres.getRepository(UserVote).insert({
-                    post,
-                    userId: interaction.user.id,
-                    voteValue: -1
-                });
-                return void interaction.reply({
-                    ephemeral: true,
-                    content: `You have successfully voted for this project.`
-                });
-            }
+        if (userVote) {
+            userVote.voteValue = points;
+            await Postgres.getRepository(UserVote).save(userVote);
+            void interaction.reply({
+                ephemeral: true,
+                content: `You already voted for this project. Your vote has successfully been updated.`
+            });
+        } else {
+            await Postgres.getRepository(UserVote).insert({
+                post,
+                userId: interaction.user.id,
+                voteValue: points,
+                guildId: interaction.guildId!
+            });
+            void interaction.reply({
+                ephemeral: true,
+                content: `You have successfully voted for this project.`
+            });
         }
-
-        await Postgres.getRepository(Post).save(post);
-
-        return void interaction.reply(successEmbed(`Post updated`));
 
     }
 

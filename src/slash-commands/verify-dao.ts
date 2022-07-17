@@ -23,7 +23,7 @@ export const commands = [
 export const run: SlashCommandRunFunction = async (interaction) => {
 
     if (interaction.user.id !== process.env.OWNER_ID) {
-        return void interaction.reply(`❌ | You can't run this command (insufficient permissions).`);
+        return void interaction.reply(errorEmbed(`You can't run this command (insufficient permissions).`));
     }
 
     const daoServerId = interaction.options.get('dao-server-id')?.value! as string;

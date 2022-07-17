@@ -79,6 +79,11 @@ export class UserVote extends BaseEntity {
     })
     userId!: string;
 
+    @Column({
+        length: 32
+    })
+    guildId!: string;
+
     @ManyToOne(() => Post, post => post.votes)
     post!: Post;
 
