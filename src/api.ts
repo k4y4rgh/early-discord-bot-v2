@@ -26,7 +26,7 @@ app.get(`/votes`, async (req, res) => {
     }
     top.sort((a, b) => b.projectValue - a.projectValue);
 
-    res.json(projects);
+    res.json(top);
 
 });
 
