@@ -36,7 +36,8 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.customId === 'new_post_modal') {
             const projectName = interaction.fields.getTextInputValue('project_name');
             const projectDescription = interaction.fields.getTextInputValue('project_description');
-            const projectTwitterUrl = interaction.fields.getTextInputValue('project_twitter_url');
+            let projectTwitterUrl = interaction.fields.getTextInputValue('project_twitter_url');
+            if (!projectTwitterUrl.startsWith('https://')) projectTwitterUrl = `https://${projectTwitterUrl}`;
             const projectImageUrl = interaction.fields.getTextInputValue('project_image_url');
 
             const post = await Postgres.getRepository(Post).insert({
@@ -70,7 +71,7 @@ client.on('interactionCreate', async (interaction) => {
                     const notificationEmbed = new EmbedBuilder()
                         .setTitle(`${projectName} has been selected by EarlyLink 🚀`)
                         .setDescription(projectDescription)
-                        .setURL('https://' + projectTwitterUrl)
+                        .setURL(projectTwitterUrl)
                         .setImage(projectImageUrl)
                         .setColor(process.env.EMBED_COLOR)
                         .setFooter({
@@ -90,8 +91,9 @@ client.on('interactionCreate', async (interaction) => {
                                 .setStyle(ButtonStyle.Danger)
                         ]) as ActionRowBuilder<ButtonBuilder>;
                     channel.send({
+                        content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
                         embeds: [notificationEmbed],
-                        components: [row]
+                        components: configuration.isVerifiedDAO ? [row] : []
                     });
                 }
             });
@@ -167,6 +169,16 @@ client.on('interactionCreate', async (interaction) => {
 
         return void interaction.reply(successEmbed(`Post updated`));
 
+    }
+
+    if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+        if (interaction.commandName === 'verify-dao') {
+            const serverName = interaction.options.getFocused();
+            return interaction.respond(interaction.client.guilds.cache.filter((g) => !serverName || g.name.includes(serverName)).map((g) => ({
+                name: g.name,
+                value: g.id
+            })).slice(0, 25));
+        }
     }
 
     if (interaction.isChatInputCommand()) {

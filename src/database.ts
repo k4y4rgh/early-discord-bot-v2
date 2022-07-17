@@ -33,6 +33,15 @@ export class GuildConfiguration extends BaseEntity {
     })
     roleId!: string;
 
+    @Column({
+        default: false
+    })
+    isVerifiedDAO!: boolean;
+
+    @CreateDateColumn()
+    createdAt!: Date;
+
+
 }
 
 @Entity()
