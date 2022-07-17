@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { Post, Postgres } from './database';
 import { MoreThan } from 'typeorm';
+import { client } from '.';
 
 const app = express();
 app.use(cors());
@@ -27,6 +28,16 @@ app.get(`/votes`, async (req, res) => {
     top.sort((a, b) => b.projectValue - a.projectValue);
 
     res.json(top);
+
+});
+
+app.get('/stats', async (req, res) => {
+
+    
+    res.json({
+        serverCount: client.guilds.cache.size,
+        userCount: 1300
+    });
 
 });
 
