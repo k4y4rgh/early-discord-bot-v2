@@ -33,4 +33,4 @@ app.get(`/votes`, async (req, res) => {
 
 });
 
-app.listen(3000);
+app.listen(process.env.API_PORT);

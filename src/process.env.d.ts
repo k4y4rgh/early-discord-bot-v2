@@ -23,5 +23,6 @@ declare namespace NodeJS {
 
         OWNER_ID: string;
         IMAGE_CONVERTER_CHANNEL_ID: string;
+        API_PORT: string;
     }
 }
