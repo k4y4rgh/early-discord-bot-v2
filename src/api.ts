@@ -9,7 +9,6 @@ app.use(cors());
 app.get(`/votes`, async (req, res) => {
 
     const days = req.query.days ? parseInt(req.query.days as string) : 30;
-    const isTop = true;
 
     const projects = await Postgres.getRepository(Post).find({
         relations: ['votes'],
@@ -18,16 +17,14 @@ app.get(`/votes`, async (req, res) => {
         }
     });
 
-    if (isTop) {
-        let top = [];
-        for (const project of projects) {
-            top.push({
-                ...project,
-                votes: project.votes.map((vote) => vote.voteValue).reduce((a, b) => a + b, 0)
-            });
-        }
-        top = top.sort((a, b) => b.votes - a.votes);
+    const top = [];
+    for (const project of projects) {
+        top.push({
+            ...project,
+            projectValue: project.votes.map((vote) => vote.voteValue).reduce((a, b) => a + b, 0)
+        });
     }
+    top.sort((a, b) => b.projectValue - a.projectValue);
 
     res.json(projects);
 
