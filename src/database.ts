@@ -57,13 +57,33 @@ export class Post extends BaseEntity {
 
 }
 
+@Entity()
+export class UserVote extends BaseEntity {
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column({
+        length: 32
+    })
+    userId!: string;
+
+    @Column()
+    postId!: number;
+
+    @Column()
+    voteValue!: number;
+
+    @CreateDateColumn()
+    createdAt!: Date;
+}
+
 export const Postgres = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    entities: [GuildConfiguration, Post],
+    entities: [GuildConfiguration, Post, UserVote],
     synchronize: process.env.ENVIRONMENT === 'development',
 });
 
@@ -74,7 +94,7 @@ export const initialize = () => Postgres.initialize().then(() => {
             branding: {
                 
             },
-            resources: [GuildConfiguration, Post],
+            resources: [GuildConfiguration, Post, UserVote],
         })
         const router = AdminJSExpress.buildRouter(admin)
         app.use(admin.options.rootPath, router)

@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-import { GuildConfiguration, initialize as initializeDatabase, Post, Postgres } from './database';
+import { GuildConfiguration, initialize as initializeDatabase, Post, Postgres, UserVote } from './database';
 import { loadContextMenus, loadMessageCommands, loadSlashCommands, synchronizeSlashCommands } from './handlers/commands';
 
 import { syncSheets } from './integrations/sheets';
@@ -98,6 +98,75 @@ client.on('interactionCreate', async (interaction) => {
 
             return void interaction.reply(successEmbed(`Post created`));
         }
+    }
+
+    if (interaction.isButton()) {
+
+        const customId = interaction.customId;
+        const postId = parseInt(customId.split('_')[1]);
+        const post = await Postgres.getRepository(Post).findOne({
+            where: {
+                id: postId
+            }
+        });
+        if (!post) {
+            return void interaction.reply({
+                ephemeral: true,
+                content: `The project you are trying to vote for does not exist anymore.`
+            });
+        }
+
+        const userVote = await Postgres.getRepository(UserVote).findOne({
+            where: {
+                postId,
+                userId: interaction.user.id
+            }
+        });
+
+        if (customId.startsWith('upvote')) {
+            if (userVote) {
+                userVote.voteValue = 1;
+                await Postgres.getRepository(UserVote).save(userVote);
+                return void interaction.reply({
+                    ephemeral: true,
+                    content: `You already voted for this project. Your vote has successfully been updated.`
+                });
+            } else {
+                await Postgres.getRepository(UserVote).insert({
+                    postId,
+                    userId: interaction.user.id,
+                    voteValue: 1
+                });
+                return void interaction.reply({
+                    ephemeral: true,
+                    content: `You have successfully voted for this project.`
+                });
+            }
+        } else if (customId.startsWith('downvote')) {
+            if (userVote) {
+                userVote.voteValue = -1;
+                await Postgres.getRepository(UserVote).save(userVote);
+                return void interaction.reply({
+                    ephemeral: true,
+                    content: `You already voted for this project. Your vote has successfully been updated.`
+                });
+            } else {
+                await Postgres.getRepository(UserVote).insert({
+                    postId,
+                    userId: interaction.user.id,
+                    voteValue: -1
+                });
+                return void interaction.reply({
+                    ephemeral: true,
+                    content: `You have successfully voted for this project.`
+                });
+            }
+        }
+
+        await Postgres.getRepository(Post).save(post);
+
+        return void interaction.reply(successEmbed(`Post updated`));
+
     }
 
     if (interaction.isChatInputCommand()) {
