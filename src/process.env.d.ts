@@ -20,5 +20,8 @@ declare namespace NodeJS {
         SPREADSHEET_ID: string|undefined;
 
         ENVIRONMENT: string;
+
+        OWNER_ID: string;
+        IMAGE_CONVERTER_CHANNEL_ID: string;
     }
 }
