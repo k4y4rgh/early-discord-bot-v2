@@ -13,7 +13,7 @@ export const commands = [
 
 export const run: SlashCommandRunFunction = async (interaction) => {
 
-    if (interaction.user.id !== process.env.OWNER_ID) {
+    if (!process.env.OWNER_IDS?.split(',').includes(interaction.user!.id)) {
         return void interaction.reply(`❌ | You can't run this command (insufficient permissions).`);
     }
 
