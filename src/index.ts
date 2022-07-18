@@ -220,6 +220,11 @@ client.on('ready', () => {
     if (process.env.SPREADSHEET_ID) {
         syncSheets();
     }
+
+    client.user?.setActivity('earlylink.io');
+    setInterval(() => {
+        client.user?.setActivity('earlylink.io');
+    }, 10 * 60 * 1000);
 });
 
 client.login(process.env.DISCORD_CLIENT_TOKEN);
