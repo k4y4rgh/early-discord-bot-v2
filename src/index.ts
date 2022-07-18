@@ -82,15 +82,15 @@ client.on('interactionCreate', async (interaction) => {
                     const row = new ActionRowBuilder()
                         .setComponents([
                             new ButtonBuilder()
-                                .setLabel('⬆️')
+                                .setLabel('⭐')
                                 .setCustomId(`upvote_1_${postId}`)
                                 .setStyle(ButtonStyle.Primary),
                             new ButtonBuilder()
-                                .setLabel('⬆️⬆️')
+                                .setLabel('✴️✴️')
                                 .setCustomId(`upvote_2_${postId}`)
                                 .setStyle(ButtonStyle.Primary),
                             new ButtonBuilder()
-                                .setLabel('⬆️⬆️⬆️')
+                                .setLabel('🌟🌟🌟')
                                 .setCustomId(`upvote_3_${postId}`)
                                 .setStyle(ButtonStyle.Primary)
                         ]) as ActionRowBuilder<ButtonBuilder>;
