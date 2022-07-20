@@ -10,10 +10,11 @@ import { syncSheets } from './integrations/sheets';
 
 import fetch from 'node-fetch';
 
-import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, IntentsBitField, InteractionType, TextChannel } from 'discord.js';
+import { ActionRow, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Client, EmbedBuilder, IntentsBitField, InteractionType, TextChannel } from 'discord.js';
 import { errorEmbed, successEmbed } from './util';
 import { loadTasks } from './handlers/tasks';
 import { IsNull, Not } from 'typeorm';
+
 export const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
@@ -72,7 +73,7 @@ client.on('interactionCreate', async (interaction) => {
 
             configurations.forEach(async (configuration) => {
                 const channel = client.channels.cache.get(configuration.channelId);
-                if (channel instanceof TextChannel) {
+                if (channel?.type === ChannelType.GuildText) {
                     const notificationEmbed = new EmbedBuilder()
                         .setTitle(`${projectName} has been selected by EarlyLink 🚀`)
                         .setDescription(projectDescription)
