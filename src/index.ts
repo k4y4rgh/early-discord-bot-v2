@@ -36,6 +36,9 @@ client.on('interactionCreate', async (interaction) => {
 
     if (interaction.type === InteractionType.ModalSubmit) {
         if (interaction.customId === 'new_post_modal') {
+
+            await interaction.deferReply();
+
             const projectName = interaction.fields.getTextInputValue('project_name');
             const projectDescription = interaction.fields.getTextInputValue('project_description');
             let projectTwitterUrl = interaction.fields.getTextInputValue('project_twitter_url');
@@ -98,11 +101,11 @@ client.on('interactionCreate', async (interaction) => {
                         content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
                         embeds: [notificationEmbed],
                         components: configuration.isVerifiedDAO ? [row] : []
-                    });
+                    }).catch((e) => {});
                 }
             });
 
-            return void interaction.reply(successEmbed(`Post created`));
+            return void interaction.followUp(successEmbed(`Post created`));
         }
     }
 
