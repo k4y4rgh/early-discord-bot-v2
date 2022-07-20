@@ -72,38 +72,43 @@ client.on('interactionCreate', async (interaction) => {
             });
 
             configurations.forEach(async (configuration) => {
-                const channel = client.channels.cache.get(configuration.channelId);
-                if (channel?.type === ChannelType.GuildText) {
-                    const notificationEmbed = new EmbedBuilder()
-                        .setTitle(`${projectName} has been selected by EarlyLink 🚀`)
-                        .setDescription(projectDescription)
-                        .setURL(projectTwitterUrl)
-                        .setImage(projectImageUrl)
-                        .setColor(process.env.EMBED_COLOR)
-                        .setFooter({
-                            text: `This channel will continue receiving EarlyLink selections 🌟`
-                        });
-                    const row = new ActionRowBuilder()
-                        .setComponents([
-                            new ButtonBuilder()
-                                .setLabel('⭐')
-                                .setCustomId(`upvote_1_${postId}`)
-                                .setStyle(ButtonStyle.Primary),
-                            new ButtonBuilder()
-                                .setLabel('✴️✴️')
-                                .setCustomId(`upvote_2_${postId}`)
-                                .setStyle(ButtonStyle.Primary),
-                            new ButtonBuilder()
-                                .setLabel('🌟🌟🌟')
-                                .setCustomId(`upvote_3_${postId}`)
-                                .setStyle(ButtonStyle.Primary)
-                        ]) as ActionRowBuilder<ButtonBuilder>;
-                    channel.send({
-                        content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
-                        embeds: [notificationEmbed],
-                        components: configuration.isVerifiedDAO ? [row] : []
-                    }).catch((e) => {});
+                if (!configuration.channelId) {
+                    console.log('No channel ID set for guild configuration');
                 }
+                client.channels.fetch(configuration.channelId).then((channel) => {
+                    console.log(`Getting channel ${configuration.channelId} (${channel?.id})`);
+                    if (channel?.type === ChannelType.GuildText) {
+                        const notificationEmbed = new EmbedBuilder()
+                            .setTitle(`${projectName} has been selected by EarlyLink 🚀`)
+                            .setDescription(projectDescription)
+                            .setURL(projectTwitterUrl)
+                            .setImage(projectImageUrl)
+                            .setColor(process.env.EMBED_COLOR)
+                            .setFooter({
+                                text: `This channel will continue receiving EarlyLink selections 🌟`
+                            });
+                        const row = new ActionRowBuilder()
+                            .setComponents([
+                                new ButtonBuilder()
+                                    .setLabel('⭐')
+                                    .setCustomId(`upvote_1_${postId}`)
+                                    .setStyle(ButtonStyle.Primary),
+                                new ButtonBuilder()
+                                    .setLabel('✴️✴️')
+                                    .setCustomId(`upvote_2_${postId}`)
+                                    .setStyle(ButtonStyle.Primary),
+                                new ButtonBuilder()
+                                    .setLabel('🌟🌟🌟')
+                                    .setCustomId(`upvote_3_${postId}`)
+                                    .setStyle(ButtonStyle.Primary)
+                            ]) as ActionRowBuilder<ButtonBuilder>;
+                        channel.send({
+                            content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
+                            embeds: [notificationEmbed],
+                            components: configuration.isVerifiedDAO ? [row] : []
+                        }).catch((e) => {});
+                    }
+                }).catch((e) => console.error(e))
             });
 
             return void interaction.followUp(successEmbed(`Post created`));
