@@ -54,7 +54,6 @@ client.on('interactionCreate', async (interaction) => {
             });
             const postId = post.identifiers[0].id;
 
-            /*
             await fetch(`https://maker.ifttt.com/trigger/earlylink_post/json/with/key/${process.env.IFTTT_KEY}`, {
                 method: 'POST',
                 headers: {
@@ -65,7 +64,6 @@ client.on('interactionCreate', async (interaction) => {
                     imageUrl: projectImageUrl
                 })
             });
-            */
 
             const configurations = await Postgres.getRepository(GuildConfiguration).find({
                 where: {
@@ -104,12 +102,11 @@ client.on('interactionCreate', async (interaction) => {
                                     .setCustomId(`upvote_3_${postId}`)
                                     .setStyle(ButtonStyle.Primary)
                             ]) as ActionRowBuilder<ButtonBuilder>;
-                        console.log(channel?.name, channel?.type)
-                        /*channel.send({
+                        channel.send({
                             content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
                             embeds: [notificationEmbed],
                             components: configuration.isVerifiedDAO ? [row] : []
-                        }).catch((e) => {});*/
+                        }).catch((e) => {});
                     }
                 }).catch((e) => console.error(e))
             });
