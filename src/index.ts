@@ -44,6 +44,7 @@ client.on('interactionCreate', async (interaction) => {
             const projectDescription = interaction.fields.getTextInputValue('project_description');
             let projectTwitterUrl = interaction.fields.getTextInputValue('project_twitter_url');
             if (!projectTwitterUrl.startsWith('https://')) projectTwitterUrl = `https://${projectTwitterUrl}`;
+            const projectTwitterUsername = projectTwitterUrl.split('/').pop();
             const projectImageUrl = interaction.fields.getTextInputValue('project_image_url');
 
             const postInsert = await Postgres.getRepository(Post).insert({
@@ -66,7 +67,7 @@ client.on('interactionCreate', async (interaction) => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    linkedAccountUrl: projectTwitterUrl,
+                    linkedAccountUrl: projectTwitterUrl, // todo modify this on ifttt and here
                     imageUrl: projectImageUrl
                 })
             });
@@ -85,13 +86,13 @@ client.on('interactionCreate', async (interaction) => {
                     console.log(`Getting channel ${configuration.channelId} (${channel?.id})`);
                     if (channel?.type === ChannelType.GuildText) {
                         const notificationEmbed = new EmbedBuilder()
-                            .setTitle(`${projectName} has been selected by EarlyLink 🚀`)
+                            .setTitle(`${projectName} has been selected by EarlyLink`)
                             .setDescription(projectDescription)
                             .setURL(projectTwitterUrl)
                             .setImage(projectImageUrl)
                             .setColor(process.env.EMBED_COLOR)
                             .setFooter({
-                                text: `This channel will continue receiving EarlyLink selections 🌟`
+                                text: `This channel will continue to receive EarlyLink selections 🌟`
                             });
                         const row = new ActionRowBuilder()
                             .setComponents([
