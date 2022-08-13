@@ -3,7 +3,7 @@ config();
 
 import './api';
 
-import { GuildConfiguration, initialize as initializeDatabase, Post, Postgres, UserVote } from './database';
+import { GuildConfiguration, initialize as initializeDatabase, Post, Postgres, PostMessage, UserVote } from './database';
 import { loadContextMenus, loadMessageCommands, loadSlashCommands, synchronizeSlashCommands } from './handlers/commands';
 
 import { syncSheets } from './integrations/sheets';
@@ -46,13 +46,15 @@ client.on('interactionCreate', async (interaction) => {
             if (!projectTwitterUrl.startsWith('https://')) projectTwitterUrl = `https://${projectTwitterUrl}`;
             const projectImageUrl = interaction.fields.getTextInputValue('project_image_url');
 
-            const post = await Postgres.getRepository(Post).insert({
+            const postInsert = await Postgres.getRepository(Post).insert({
                 projectName,
                 projectDescription,
                 projectTwitterUrl,
                 projectImageUrl
             });
-            const postId = post.identifiers[0].id;
+            const postId = postInsert.identifiers[0].id;
+
+            const postData = await Postgres.getRepository(Post).findOne(postId) as Post;
 
             await fetch(`https://maker.ifttt.com/trigger/earlylink_post/json/with/key/${process.env.IFTTT_KEY}`, {
                 method: 'POST',
@@ -98,7 +100,17 @@ client.on('interactionCreate', async (interaction) => {
                             content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
                             embeds: [notificationEmbed],
                             components: configuration.isVerifiedDAO ? [row] : []
-                        }).catch((e) => {});
+                        })
+                        .then((message) => {
+                            Postgres.getRepository(PostMessage).insert({
+                                messageId: message.id,
+                                channelId: message.channel.id,
+                                guildId: message.guild!.id,
+                                post: postData
+                            });
+                            console.log(`Successfully sent message to channel ${message.channel.id}`);
+                        })
+                        .catch((e) => {});
                     }
                 }).catch((e) => console.error(e))
             });

@@ -1,4 +1,4 @@
-import { Entity, Column, DataSource, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Entity, Column, DataSource, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, ManyToMany, ManyToOne, OneToMany, RelationId } from "typeorm";
 import express from 'express';
 import { Database, Resource } from '@adminjs/typeorm';
 import { validate } from 'class-validator';
@@ -67,6 +67,30 @@ export class Post extends BaseEntity {
     @CreateDateColumn()
     createdAt!: Date;
 
+}
+
+@Entity()
+export class PostMessage extends BaseEntity {
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Column()
+    messageId!: string;
+
+    @Column()
+    channelId!: string;
+
+    @Column()
+    guildId!: string;
+
+    @Column()
+    post!: Post;
+
+    @RelationId((message: PostMessage) => message.post)
+    postId!: number;
+
+    @CreateDateColumn()
+    createdAt!: Date;
 }
 
 @Entity()
