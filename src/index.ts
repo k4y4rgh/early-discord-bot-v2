@@ -159,7 +159,7 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
-        if (interaction.commandName === 'verify-dao') {
+        if (interaction.commandName === 'verify-dao' || interaction.commandName === 'unverify-dao') {
             const serverName = interaction.options.getFocused();
             return interaction.respond(interaction.client.guilds.cache.filter((g) => !serverName || g.name.includes(serverName)).map((g) => ({
                 name: g.name,
