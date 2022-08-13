@@ -16,14 +16,20 @@ export const run: SlashCommandRunFunction = async (interaction) => {
     if (!process.env.OWNER_IDS?.split(',').includes(interaction.user!.id)) {
         return void interaction.reply(`❌ | You can't run this command (insufficient permissions).`);
     }
-    
+
+    const verifiedDaos = await Postgres.getRepository(GuildConfiguration).find({
+        where: {
+            isVerifiedDAO: true
+        }
+    });
+
     // post to hastebin
     fetch(`https://hastebin.androz2091.fr/documents`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: interaction.client.guilds.cache.sort((a, b) => b.memberCount - a.memberCount).map(guild => `${guild.name} - ${guild.memberCount}`).join('\n')
+        body: interaction.client.guilds.cache.sort((a, b) => b.memberCount - a.memberCount).map(guild => `${verifiedDaos.some((d) => d.guildId === guild.id) ? '✅ ' : ''}${guild.name} - ${guild.memberCount}`).join('\n')
     }).then(res => res.json()).then(async (json) => {
         console.log(json)
         const serverCount = interaction.client.guilds.cache.size;
