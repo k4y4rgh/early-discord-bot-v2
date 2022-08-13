@@ -90,17 +90,9 @@ client.on('interactionCreate', async (interaction) => {
                         const row = new ActionRowBuilder()
                             .setComponents([
                                 new ButtonBuilder()
-                                    .setLabel('⭐')
+                                    .setLabel('Upote')
                                     .setCustomId(`upvote_1_${postId}`)
-                                    .setStyle(ButtonStyle.Primary),
-                                new ButtonBuilder()
-                                    .setLabel('✴️✴️')
-                                    .setCustomId(`upvote_2_${postId}`)
-                                    .setStyle(ButtonStyle.Primary),
-                                new ButtonBuilder()
-                                    .setLabel('🌟🌟🌟')
-                                    .setCustomId(`upvote_3_${postId}`)
-                                    .setStyle(ButtonStyle.Primary)
+                                    .setStyle(ButtonStyle.Success)
                             ]) as ActionRowBuilder<ButtonBuilder>;
                         channel.send({
                             content: configuration.roleId ? `<@&${configuration.roleId}>` : '',
