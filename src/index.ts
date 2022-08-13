@@ -52,9 +52,13 @@ client.on('interactionCreate', async (interaction) => {
                 projectTwitterUrl,
                 projectImageUrl
             });
-            const postId = postInsert.identifiers[0].id;
+            const postId = postInsert.identifiers[0].id as number;
 
-            const postData = await Postgres.getRepository(Post).findOne(postId) as Post;
+            const postData = await Postgres.getRepository(Post).findOne({
+                where: {
+                    id: postId
+                }
+            }) as Post;
 
             await fetch(`https://maker.ifttt.com/trigger/earlylink_post/json/with/key/${process.env.IFTTT_KEY}`, {
                 method: 'POST',
@@ -176,6 +180,14 @@ client.on('interactionCreate', async (interaction) => {
             return interaction.respond(interaction.client.guilds.cache.filter((g) => !serverName || g.name.includes(serverName)).map((g) => ({
                 name: g.name,
                 value: g.id
+            })).slice(0, 25));
+        }
+        if (interaction.commandName === 'del-post' || interaction.commandName === 'edit-post') {
+            const posts = await Postgres.getRepository(Post).find();
+            const projectName = interaction.options.getFocused();
+            return interaction.respond(posts.filter((p) => !projectName || p.projectName.includes(projectName)).map((p) => ({
+                name: p.projectName,
+                value: p.id
             })).slice(0, 25));
         }
     }
