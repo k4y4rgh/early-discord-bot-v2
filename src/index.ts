@@ -67,7 +67,7 @@ client.on('interactionCreate', async (interaction) => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    linkedAccountUrl: projectTwitterUrl, // todo modify this on ifttt and here
+                    linkedAccountName: projectTwitterUsername,
                     imageUrl: projectImageUrl
                 })
             });
