@@ -124,7 +124,7 @@ export const Postgres = new DataSource({
     database: process.env.DB_NAME,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    entities: [GuildConfiguration, Post, UserVote],
+    entities: [GuildConfiguration, Post, UserVote, PostMessage],
     synchronize: process.env.ENVIRONMENT === 'development',
 });
 
@@ -135,7 +135,7 @@ export const initialize = () => Postgres.initialize().then(() => {
             branding: {
                 
             },
-            resources: [GuildConfiguration, Post, UserVote],
+            resources: [GuildConfiguration, Post, UserVote, PostMessage],
         })
         const router = AdminJSExpress.buildRouter(admin)
         app.use(admin.options.rootPath, router)
