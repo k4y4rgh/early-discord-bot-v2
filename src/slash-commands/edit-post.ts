@@ -39,6 +39,7 @@ export const run: SlashCommandRunFunction = async (interaction) => {
     }
 
     const postId = parseInt(interaction.options.get('post-id')?.value! as string);
+    if (!postId) return void interaction.reply(errorEmbed(`Invalid post ID. Please select an element from the dropdown list.`));
     const postData = await Postgres.getRepository(Post).findOne({
         where: {
             id: postId

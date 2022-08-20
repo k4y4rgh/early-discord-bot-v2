@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, PermissionsBitField, TextChannel } from "discord.js";
 import { IsNull, Not } from "typeorm";
-import { GuildConfiguration, Post, Postgres, PostMessage } from "../database";
+import { GuildConfiguration, Post, Postgres, PostMessage, UserVote } from "../database";
 import { SlashCommandRunFunction } from "../handlers/commands";
 import { errorEmbed, successEmbed } from "../util";
 
@@ -27,6 +27,7 @@ export const run: SlashCommandRunFunction = async (interaction) => {
     }
 
     const postId = parseInt(interaction.options.get('post-id')?.value! as string);
+    if (!postId) return void interaction.reply(errorEmbed(`Invalid post ID. Please select an element from the dropdown list.`));
     const postData = await Postgres.getRepository(Post).findOne({
         where: {
             id: postId
@@ -36,6 +37,12 @@ export const run: SlashCommandRunFunction = async (interaction) => {
     if (!postData) {
         return void interaction.reply(errorEmbed(`Post with ID ${postId} not found.`));
     }
+
+    await Postgres.getRepository(UserVote).delete({
+        post: {
+            id: postId
+        }
+    });
 
     const messages = await Postgres.getRepository(PostMessage).find({
         where: {
