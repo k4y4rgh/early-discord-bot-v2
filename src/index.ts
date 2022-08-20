@@ -188,7 +188,7 @@ client.on('interactionCreate', async (interaction) => {
             const projectName = interaction.options.getFocused();
             return interaction.respond(posts.filter((p) => !projectName || p.projectName.includes(projectName)).map((p) => ({
                 name: p.projectName,
-                value: p.id
+                value: p.id.toString()
             })).slice(0, 25));
         }
     }

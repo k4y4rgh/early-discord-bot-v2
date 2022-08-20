@@ -9,13 +9,8 @@ app.use(cors());
 
 app.get(`/votes`, async (req, res) => {
 
-    const days = req.query.days ? parseInt(req.query.days as string) : 30;
-
     const projects = await Postgres.getRepository(Post).find({
-        relations: ['votes'],
-        where: {
-            createdAt: MoreThan(new Date(Date.now() - days * 24 * 60 * 60 * 1000))
-        }
+        relations: ['votes']
     });
 
     const top = [];
