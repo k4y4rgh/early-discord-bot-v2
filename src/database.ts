@@ -83,7 +83,7 @@ export class PostMessage extends BaseEntity {
     @Column()
     guildId!: string;
 
-    @Column()
+    @ManyToOne(() => Post)
     post!: Post;
 
     @RelationId((message: PostMessage) => message.post)
